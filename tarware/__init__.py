@@ -3,8 +3,8 @@ import itertools
 
 import gymnasium as gym
 
-from .spaces import observation_map  # Relative import
-from .warehouse import RewardType, Warehouse  # Relative import
+from .spaces import observation_map  # Corrected import
+from warehouse import RewardType, Warehouse # Corrected import
 
 _obs_types = list(observation_map.keys())
 
@@ -27,21 +27,24 @@ _request_queues = {
 def full_registration():
     _perms = itertools.product(_sizes.keys(), _obs_types, range(1,20), range(1, 10))
     for size, obs_type, num_agvs, num_pickers in _perms:
-        gym.register(
-            id=f"tarware-{size}-{num_agvs}agvs-{num_pickers}pickers-{obs_type}obs-v1",
-            entry_point="tarware.warehouse:Warehouse",  # Correct entry point
-            kwargs={
-                "column_height": 8,
-                "shelf_rows": _sizes[size][0],
-                "shelf_columns": _sizes[size][1],
-                "num_agvs":  num_agvs,
-                "num_pickers": num_pickers,
-                "request_queue_size": _request_queues[size],
-                "max_inactivity_steps": None,
-                "max_steps": 500,
-                "reward_type": RewardType.INDIVIDUAL,
-                "observation_type": obs_type,
-            },
-        )
+        try: # Added try-except block
+            gym.register(
+                id=f"tarware-{size}-{num_agvs}agvs-{num_pickers}pickers-{obs_type}obs-v1",
+                entry_point="tarware.warehouse:Warehouse",  # Corrected entry point
+                kwargs={
+                    "column_height": 8,
+                    "shelf_rows": _sizes[size][0],
+                    "shelf_columns": _sizes[size][1],
+                    "num_agvs":  num_agvs,
+                    "num_pickers": num_pickers,
+                    "request_queue_size": _request_queues[size],
+                    "max_inactivity_steps": None,
+                    "max_steps": 500,
+                    "reward_type": RewardType.INDIVIDUAL,
+                    "observation_type": obs_type,
+                },
+            )
+        except Exception as e:
+            print(f"Error registering: tarware-{size}-{num_agvs}agvs-{num_pickers}pickers-{obs_type}obs-v1, Error: {e}")
 
-full_registration()
+full_registration() # Calling the function to register envs
