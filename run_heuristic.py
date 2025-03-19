@@ -4,7 +4,14 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 import gymnasium as gym
 
-from heuristic import heuristic_episode  # Relative import
+import sys
+import os
+
+# Add the 'tarware' directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), "tarware"))
+
+from heuristic import heuristic_episode  # Now it should work
+
 
 print("Script started.")
 
@@ -52,8 +59,9 @@ def info_statistics(infos, global_episode_return, episode_returns):
 if __name__ == "__main__":
     try:
         print("Creating environment...")
-        # Corrected environment ID
+        # ********* CORRECTED ENVIRONMENT ID:  Include -v1 *********
         env = gym.make("tarware-extralarge-14agvs-7pickers-partialobs-v1")
+        # *********************************************************
         print("Environment created.")
         seed = args.seed
         completed_episodes = 0
