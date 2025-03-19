@@ -1,9 +1,10 @@
+# tarware/__init__.py
 import itertools
 
 import gymnasium as gym
 
-from spaces import observation_map
-from warehouse import RewardType
+from .spaces import observation_map  # Relative import
+from .warehouse import RewardType, Warehouse  # Relative import
 
 _obs_types = list(observation_map.keys())
 
@@ -23,41 +24,18 @@ _request_queues = {
     "extralarge": 60,
 }
 
-_perms = itertools.product(_sizes.keys(), _obs_types, range(1,20), range(1, 10))
-
-for size, obs_type, num_agvs, num_pickers in _perms:
-    # normal tasks
-    gym.register(
-        id=f"tarware-{size}-{num_agvs}agvs-{num_pickers}pickers-{obs_type}obs-v1",
-        entry_point="tarware.warehouse:Warehouse",
-        kwargs={
-            "column_height": 8,
-            "shelf_rows": _sizes[size][0],
-            "shelf_columns": _sizes[size][1],
-            "num_agvs":  num_agvs,
-            "num_pickers": num_pickers,
-            "request_queue_size": _request_queues[size],
-            "max_inactivity_steps": None,
-            "max_steps": 500,
-            "reward_type": RewardType.INDIVIDUAL,
-            "observation_type": obs_type,
-        },
-    )
-
 def full_registration():
-    _perms = itertools.product(_sizes.keys(), _obs_types, _request_queues, range(1,20), range(1, 10),)
+    _perms = itertools.product(_sizes.keys(), _obs_types, range(1,20), range(1, 10))
     for size, obs_type, num_agvs, num_pickers in _perms:
-        # normal tasks with modified column height
         gym.register(
             id=f"tarware-{size}-{num_agvs}agvs-{num_pickers}pickers-{obs_type}obs-v1",
-            entry_point="tarware.warehouse:Warehouse",
+            entry_point="tarware.warehouse:Warehouse",  # Correct entry point
             kwargs={
                 "column_height": 8,
                 "shelf_rows": _sizes[size][0],
                 "shelf_columns": _sizes[size][1],
                 "num_agvs":  num_agvs,
                 "num_pickers": num_pickers,
-                "sensor_range": 1,
                 "request_queue_size": _request_queues[size],
                 "max_inactivity_steps": None,
                 "max_steps": 500,
@@ -65,3 +43,5 @@ def full_registration():
                 "observation_type": obs_type,
             },
         )
+
+full_registration()
